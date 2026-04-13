@@ -1,0 +1,106 @@
+{{- if .Values.monitoring.grafana.dashboards.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "simple-crud-app.fullname" . }}-dashboard
+  labels:
+    {{- include "simple-crud-app.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  fastapi-crud.json: |
+    {
+      "annotations": { "list": [] },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "links": [],
+      "panels": [
+        {
+          "title": "Request Rate (req/s)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{service=\"{{ include "simple-crud-app.fullname" . }}\"}[5m])) by (method, handler, status)",
+              "legendFormat": "{{`{{method}}`}} {{`{{handler}}`}} {{`{{status}}`}}"
+            }
+          ]
+        },
+        {
+          "title": "Request Duration (p95)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"{{ include "simple-crud-app.fullname" . }}\"}[5m])) by (le, handler))",
+              "legendFormat": "{{`{{handler}}`}} p95"
+            }
+          ]
+        },
+        {
+          "title": "Active Requests",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+          "targets": [
+            {
+              "expr": "sum(http_requests_in_progress{service=\"{{ include "simple-crud-app.fullname" . }}\"})"
+            }
+          ]
+        },
+        {
+          "title": "Error Rate (5xx)",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{service=\"{{ include "simple-crud-app.fullname" . }}\", status=~\"5..\"}[5m]))"
+            }
+          ]
+        },
+        {
+          "title": "Pod Logs",
+          "type": "logs",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+          "targets": [
+            {
+              "expr": "{namespace=\"{{ .Release.Namespace }}\", app_kubernetes_io_name=\"{{ include "simple-crud-app.name" . }}\"}",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending",
+            "enableLogDetails": true
+          },
+          "datasource": { "type": "loki", "uid": "loki" }
+        },
+        {
+          "title": "CNPG — Transactions per Second",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+          "targets": [
+            {
+              "expr": "sum(rate(cnpg_pg_stat_database_xact_commit{datname=\"crud_db\"}[5m]))",
+              "legendFormat": "commits/s"
+            }
+          ]
+        },
+        {
+          "title": "CNPG — Replication Lag (bytes)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+          "targets": [
+            {
+              "expr": "cnpg_pg_replication_lag{namespace=\"{{ .Release.Namespace }}\"}",
+              "legendFormat": "{{`{{pod}}`}}"
+            }
+          ]
+        }
+      ],
+      "schemaVersion": 39,
+      "templating": { "list": [] },
+      "time": { "from": "now-1h", "to": "now" },
+      "title": "FastAPI CRUD App",
+      "uid": "fastapi-crud-app"
+    }
+{{- end }}

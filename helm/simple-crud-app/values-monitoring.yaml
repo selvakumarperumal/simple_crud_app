@@ -1,0 +1,22 @@
+# values-monitoring.yaml
+# Overlay to enable full monitoring stack integration.
+# Usage: helm install crud-app . -f values.yaml -f values-monitoring.yaml
+
+cnpg:
+  monitoring:
+    enabled: true
+
+monitoring:
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    additionalLabels:
+      release: prometheus-stack
+  grafana:
+    dashboards:
+      enabled: true
+  loki:
+    datasource:
+      enabled: true
+      url: http://loki:3100
+      grafanaNamespace: monitoring
