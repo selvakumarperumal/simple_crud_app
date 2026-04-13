@@ -13,6 +13,7 @@ data:
     datasources:
       - name: Loki
         type: loki
+        uid: loki
         access: proxy
         url: {{ .Values.monitoring.loki.datasource.url }}
         isDefault: false

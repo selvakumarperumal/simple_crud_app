@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import select
@@ -50,7 +50,7 @@ async def update_item(
     update_data = payload.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(item, key, value)
-    item.updated_at = datetime.utcnow()
+    item.updated_at = datetime.now(UTC)
     session.add(item)
     await session.commit()
     await session.refresh(item)

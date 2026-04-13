@@ -65,5 +65,3 @@ monitoring:
       enabled: false
       url: http://loki:3100
       grafanaNamespace: monitoring
-    dashboards:
-      enabled: false

@@ -98,10 +98,13 @@ minikube start --cpus 4 --memory 4096 --driver=docker
 The [CloudNativePG operator](https://cloudnative-pg.io/) must be installed in the cluster before deploying.
 
 ```bash
-kubectl apply --server-side -f \
-  https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.25/releases/cnpg-1.25.0.yaml
+helm repo add cnpg https://cloudnative-pg.github.io/charts
+helm repo update
 
-kubectl wait --for=condition=Available deployment/cnpg-controller-manager \
+helm install cnpg cnpg/cloudnative-pg \
+  --namespace cnpg-system --create-namespace
+
+kubectl wait --for=condition=Available deployment/cnpg-cloudnative-pg \
   -n cnpg-system --timeout=120s
 ```
 
@@ -308,7 +311,8 @@ kubectl exec <pod-name> -n crud -- env | grep DATABASE_URL
 helm uninstall crud-app -n crud
 helm uninstall loki -n monitoring
 helm uninstall prometheus-stack -n monitoring
-kubectl delete namespace crud monitoring
+helm uninstall cnpg -n cnpg-system
+kubectl delete namespace crud monitoring cnpg-system
 minikube stop
 ```
 
@@ -317,8 +321,9 @@ minikube stop
 **Prerequisite:** Install the [CloudNativePG operator](https://cloudnative-pg.io/) in your cluster first:
 
 ```bash
-kubectl apply --server-side -f \
-  https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.25/releases/cnpg-1.25.0.yaml
+helm repo add cnpg https://cloudnative-pg.github.io/charts
+helm install cnpg cnpg/cloudnative-pg \
+  --namespace cnpg-system --create-namespace
 ```
 
 Then deploy:
