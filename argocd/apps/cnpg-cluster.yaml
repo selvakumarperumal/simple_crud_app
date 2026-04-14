@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cnpg-cluster
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # TODO: Replace with your Git repo URL
+    repoURL: https://github.com/<your-org>/simple_crud_app.git
+    path: helm/cnpg-cluster
+    targetRevision: HEAD
+    helm:
+      releaseName: crud-db
+      valuesObject:
+        cluster:
+          instances: 1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: crud
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

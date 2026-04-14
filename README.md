@@ -14,6 +14,7 @@ FastAPI CRUD application with SQLModel, asyncpg, Pydantic, Docker, and Helm.
 - **Prometheus** — metrics collection
 - **Grafana** — dashboards & visualization
 - **Loki** — log aggregation
+- **ArgoCD** — GitOps continuous delivery
 
 ## Project Structure
 
@@ -45,6 +46,14 @@ helm/
         ├── servicemonitor.yaml
         ├── loki-datasource.yaml
         └── grafana-dashboard.yaml
+argocd/
+├── app-of-apps.yaml              # Root Application (bootstrap)
+└── apps/
+    ├── cnpg-operator.yaml         # Wave 0 — CNPG operator
+    ├── monitoring-stack.yaml      # Wave 0 — Prometheus + Grafana
+    ├── loki.yaml                  # Wave 1 — Loki + Promtail
+    ├── cnpg-cluster.yaml          # Wave 2 — PostgreSQL cluster
+    └── crud-app.yaml              # Wave 3 — FastAPI application
 Dockerfile
 docker-compose.yml
 pyproject.toml
@@ -334,7 +343,106 @@ kubectl delete namespace crud monitoring cnpg-system
 minikube stop
 ```
 
-## Helm Deployment (General)
+## Deploy with ArgoCD (GitOps)
+
+ArgoCD manages the full stack declaratively — no manual `helm install` or `kubectl wait` needed. Sync waves ensure correct ordering:
+
+| Wave | Application | What it deploys |
+|------|-------------|------------------|
+| 0 | `cnpg-operator` | CloudNativePG operator |
+| 0 | `monitoring-stack` | Prometheus + Grafana (kube-prometheus-stack) |
+| 1 | `loki` | Loki + Promtail |
+| 2 | `cnpg-cluster` | PostgreSQL cluster (CNPG) |
+| 3 | `crud-app` | FastAPI application |
+
+ArgoCD waits for each wave's resources to be **healthy** before proceeding — it natively understands Deployment readiness, CNPG Cluster health, StatefulSet availability, etc. This replaces all `kubectl wait` commands.
+
+### 1. Install ArgoCD
+
+```bash
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# Wait for ArgoCD to be ready
+kubectl wait --for=condition=Available deployment/argocd-server \
+  -n argocd --timeout=120s
+```
+
+### 2. Update Git Repo URL
+
+Edit the `repoURL` in these files to point to your Git repository:
+
+- `argocd/app-of-apps.yaml`
+- `argocd/apps/cnpg-cluster.yaml`
+- `argocd/apps/crud-app.yaml`
+
+```bash
+# Example: replace placeholder with your actual repo
+sed -i 's|https://github.com/<your-org>/simple_crud_app.git|https://github.com/myuser/simple_crud_app.git|g' \
+  argocd/app-of-apps.yaml argocd/apps/cnpg-cluster.yaml argocd/apps/crud-app.yaml
+```
+
+### 3. Build the Docker Image (Minikube only)
+
+```bash
+eval $(minikube docker-env)
+docker build -t simple-crud-app:latest .
+```
+
+### 4. Bootstrap — Apply the App-of-Apps
+
+```bash
+kubectl apply -f argocd/app-of-apps.yaml
+```
+
+This single command deploys **everything**. ArgoCD will:
+1. Install CNPG operator + monitoring stack (wave 0)
+2. Install Loki (wave 1)
+3. Create the PostgreSQL cluster (wave 2)
+4. Deploy the FastAPI app (wave 3)
+
+### 5. Access ArgoCD UI
+
+```bash
+# Get the admin password
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath="{.data.password}" | base64 -d; echo
+
+# Port-forward the ArgoCD server
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+
+Open https://localhost:8080
+- **Username:** `admin`
+- **Password:** (from the command above)
+
+### 6. Verify All Applications
+
+```bash
+# Install ArgoCD CLI (optional)
+# brew install argocd  OR  curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 && chmod +x argocd
+
+# Check all app statuses
+kubectl get applications -n argocd
+
+# Expected output — all should be Synced/Healthy:
+# NAME               SYNC STATUS   HEALTH STATUS
+# cnpg-operator      Synced        Healthy
+# monitoring-stack   Synced        Healthy
+# loki               Synced        Healthy
+# cnpg-cluster       Synced        Healthy
+# crud-app           Synced        Healthy
+```
+
+### ArgoCD Cleanup
+
+```bash
+kubectl delete -f argocd/app-of-apps.yaml
+kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl delete namespace argocd
+```
+
+## Helm Deployment (Manual — without ArgoCD)
 
 **Prerequisite:** Install the [CloudNativePG operator](https://cloudnative-pg.io/) in your cluster first:
 

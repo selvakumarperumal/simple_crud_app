@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring-stack
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: "*"
+    helm:
+      releaseName: prometheus-stack
+      valuesObject:
+        grafana:
+          adminPassword: admin123
+          service:
+            type: NodePort
+          sidecar:
+            dashboards:
+              enabled: true
+              searchNamespace: ALL
+            datasources:
+              enabled: true
+              searchNamespace: ALL
+        prometheus:
+          prometheusSpec:
+            scrapeInterval: 15s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

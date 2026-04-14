@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: crud-app
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # TODO: Replace with your Git repo URL
+    repoURL: https://github.com/<your-org>/simple_crud_app.git
+    path: helm/simple-crud-app
+    targetRevision: HEAD
+    helm:
+      releaseName: crud-app
+      valueFiles:
+        - values.yaml
+        - values-monitoring.yaml
+      valuesObject:
+        image:
+          pullPolicy: Never
+        service:
+          type: NodePort
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: crud
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
