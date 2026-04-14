@@ -34,23 +34,11 @@ autoscaling:
   maxReplicas: 5
   targetCPUUtilizationPercentage: 80
 
-cnpg:
-  enabled: true
-  instances: 2
-  database: crud_db
-  owner: app
-  storage:
-    size: 1Gi
-    storageClass: ""
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: "1"
-      memory: 512Mi
-  monitoring:
-    enabled: false
+database:
+  secretName: crud-db-app
+  secretKey: uri
+  host: crud-db-rw
+  port: 5432
 
 monitoring:
   serviceMonitor:

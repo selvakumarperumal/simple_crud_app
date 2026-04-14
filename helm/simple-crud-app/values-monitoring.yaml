@@ -2,10 +2,6 @@
 # Overlay to enable full monitoring stack integration.
 # Usage: helm install crud-app . -f values.yaml -f values-monitoring.yaml
 
-cnpg:
-  monitoring:
-    enabled: true
-
 monitoring:
   serviceMonitor:
     enabled: true

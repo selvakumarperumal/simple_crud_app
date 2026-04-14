@@ -19,7 +19,7 @@ spec:
       initContainers:
         - name: wait-for-pg
           image: busybox:1.36
-          command: ["sh", "-c", "until nc -z {{ include \"simple-crud-app.fullname\" . }}-pg-rw 5432; do echo waiting for cnpg; sleep 2; done"]
+          command: ["sh", "-c", "until nc -z {{ .Values.database.host }} {{ .Values.database.port }}; do echo waiting for postgres; sleep 2; done"]
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -32,10 +32,10 @@ spec:
             - name: PG_URI
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "simple-crud-app.fullname" . }}-pg-app
-                  key: uri
+                  name: {{ .Values.database.secretName }}
+                  key: {{ .Values.database.secretKey }}
             - name: DATABASE_URL
-              value: $(PG_URI)?sslmode=prefer
+              value: $(PG_URI)
           command: ["sh", "-c", "export DATABASE_URL=$(echo $DATABASE_URL | sed 's|^postgresql://|postgresql+asyncpg://|'); exec uvicorn app.main:app --host 0.0.0.0 --port 8000"]
           livenessProbe:
             httpGet:

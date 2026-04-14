@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cnpg-cluster
+description: CloudNativePG PostgreSQL cluster for the CRUD app
+type: application
+version: 0.1.0
+appVersion: "16"

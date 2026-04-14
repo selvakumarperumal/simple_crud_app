@@ -1,0 +1,22 @@
+cluster:
+  name: crud-db
+  instances: 2
+  imageName: ghcr.io/cloudnative-pg/postgresql:16
+
+  database: crud_db
+  owner: app
+
+  storage:
+    size: 1Gi
+    storageClass: ""
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+  monitoring:
+    enabled: false
