@@ -18,6 +18,9 @@ spec:
       valuesObject:
         grafana:
           enabled: false
+          sidecar:
+            datasources:
+              enabled: false
         promtail:
           enabled: true
         loki:

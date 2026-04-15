@@ -111,9 +111,14 @@ minikube start --cpus 4 --memory 4096 --driver=docker
 ### 2. Build the Docker Image
 
 ```bash
-eval $(minikube docker-env)
-docker build -t simple-crud-app:latest .
+minikube image build -t simple-crud-app:latest .
 ```
+
+> **Alternative:** If you prefer using the Docker CLI directly:
+> ```bash
+> eval $(minikube docker-env)
+> docker build -t simple-crud-app:latest .
+> ```
 
 Now choose **one** of the two deployment methods below:
 
