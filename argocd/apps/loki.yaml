@@ -16,16 +16,14 @@ spec:
     helm:
       releaseName: loki
       valuesObject:
-        grafana:
-          enabled: false
-          sidecar:
-            datasources:
-              enabled: false
-        promtail:
-          enabled: true
         loki:
+          isDefault: false
           persistence:
             enabled: false
+        grafana:
+          enabled: false
+        promtail:
+          enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
