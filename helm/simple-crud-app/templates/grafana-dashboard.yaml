@@ -1,8 +1,10 @@
 {{- if .Values.monitoring.grafana.dashboards.enabled }}
+{{- $fullname := include "simple-crud-app.fullname" . -}}
+{{- $name := include "simple-crud-app.name" . -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "simple-crud-app.fullname" . }}-dashboard
+  name: {{ $fullname }}-dashboard
   labels:
     {{- include "simple-crud-app.labels" . | nindent 4 }}
     grafana_dashboard: "1"
@@ -21,7 +23,7 @@ data:
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
           "targets": [
             {
-              "expr": "sum(rate(http_request_duration_seconds_count{service=\"{{ include \"simple-crud-app.fullname\" . }}\"}[5m])) by (method, handler, status)",
+              "expr": "sum(rate(http_request_duration_seconds_count{service=\"{{ $fullname }}\"}[5m])) by (method, handler, status)",
               "legendFormat": "{{`{{method}}`}} {{`{{handler}}`}} {{`{{status}}`}}"
             }
           ]
@@ -32,7 +34,7 @@ data:
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
           "targets": [
             {
-              "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"{{ include "simple-crud-app.fullname" . }}\"}[5m])) by (le, handler))",
+              "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"{{ $fullname }}\"}[5m])) by (le, handler))",
               "legendFormat": "{{`{{handler}}`}} p95"
             }
           ]
@@ -43,7 +45,7 @@ data:
           "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
           "targets": [
             {
-              "expr": "sum(http_requests_in_progress{service=\"{{ include "simple-crud-app.fullname" . }}\"})"
+              "expr": "sum(http_requests_in_progress{service=\"{{ $fullname }}\"})"
             }
           ]
         },
@@ -53,7 +55,7 @@ data:
           "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
           "targets": [
             {
-              "expr": "sum(rate(http_request_duration_seconds_count{service=\"{{ include \"simple-crud-app.fullname\" . }}\", status=~\"5..\"}[5m]))"
+              "expr": "sum(rate(http_request_duration_seconds_count{service=\"{{ $fullname }}\", status=~\"5..\"}[5m]))"
             }
           ]
         },
@@ -63,7 +65,7 @@ data:
           "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
           "targets": [
             {
-              "expr": "{namespace=\"{{ .Release.Namespace }}\", app_kubernetes_io_name=\"{{ include "simple-crud-app.name" . }}\"}",
+              "expr": "{namespace=\"{{ .Release.Namespace }}\", app_kubernetes_io_name=\"{{ $name }}\"}",
               "refId": "A"
             }
           ],
