@@ -19,11 +19,12 @@ spec:
       valueFiles:
         - values.yaml
         - values-monitoring.yaml
+      # --- Minikube overrides (remove for EKS) ---
       valuesObject:
         image:
-          pullPolicy: Never
+          pullPolicy: Never        # EKS: remove or set to Always
         service:
-          type: NodePort
+          type: NodePort            # EKS: remove (uses ClusterIP default)
   destination:
     server: https://kubernetes.default.svc
     namespace: crud

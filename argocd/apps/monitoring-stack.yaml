@@ -15,11 +15,12 @@ spec:
     targetRevision: "*"
     helm:
       releaseName: prometheus-stack
+      # --- Minikube overrides (remove for EKS) ---
       valuesObject:
         grafana:
           adminPassword: admin123
           service:
-            type: NodePort
+            type: NodePort            # EKS: remove (uses ClusterIP default)
           sidecar:
             dashboards:
               enabled: true
