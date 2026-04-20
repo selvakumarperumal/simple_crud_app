@@ -19,4 +19,4 @@ cluster:
       memory: 512Mi
 
   monitoring:
-    enabled: false
+    enabled: true

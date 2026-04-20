@@ -42,14 +42,15 @@ database:
 
 monitoring:
   serviceMonitor:
-    enabled: false
+    enabled: true
     interval: 15s
-    additionalLabels: {}
+    additionalLabels:
+      release: prometheus-stack
   grafana:
     dashboards:
-      enabled: false
+      enabled: true
   loki:
     datasource:
-      enabled: false
+      enabled: true
       url: http://loki:3100
       grafanaNamespace: monitoring

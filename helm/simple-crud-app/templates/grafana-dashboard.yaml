@@ -23,6 +23,7 @@ data:
           "description": "Shows the rate of incoming HTTP requests per second, broken down by HTTP method, handler, and response status code. Useful for identifying traffic spikes or drops.",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
               "expr": "sum(rate(http_request_duration_seconds_count{service=\"{{ $fullname }}\"}[5m])) by (method, handler, status)",
@@ -35,6 +36,7 @@ data:
           "description": "Displays the 95th percentile response time for HTTP requests by handler. Indicates that 95% of requests are completed within this duration. High values point to performance bottlenecks in specific endpoints.",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
               "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"{{ $fullname }}\"}[5m])) by (le, handler))",
@@ -47,6 +49,7 @@ data:
           "description": "Shows the current number of in-flight HTTP requests being processed by the application. Helps identify concurrency levels or potentially stuck requests.",
           "type": "stat",
           "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
               "expr": "sum(http_requests_in_progress{service=\"{{ $fullname }}\"})"
@@ -58,6 +61,7 @@ data:
           "description": "Displays the rate of server-side (5xx) errors over the last 5 minutes. Spikes indicate application crashes, unhandled exceptions, or systemic issues preventing successful request processing.",
           "type": "stat",
           "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
               "expr": "sum(rate(http_request_duration_seconds_count{service=\"{{ $fullname }}\", status=~\"5..\"}[5m]))"
@@ -87,6 +91,7 @@ data:
           "description": "Shows the rate of committed transactions per second in the CloudNativePG database (crud_db). Indicates the database write and commit workload.",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
               "expr": "sum(rate(cnpg_pg_stat_database_xact_commit{datname=\"crud_db\"}[5m]))",
@@ -99,6 +104,7 @@ data:
           "description": "Monitors the replication lag between the primary and standby nodes in the CloudNativePG cluster in bytes. High lag can indicate network issues, disk I/O bottlenecks, or an overloaded standby.",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
               "expr": "cnpg_pg_replication_lag{namespace=\"{{ .Release.Namespace }}\"}",
