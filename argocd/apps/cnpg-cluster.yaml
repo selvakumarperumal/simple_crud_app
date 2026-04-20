@@ -18,6 +18,8 @@ spec:
       valuesObject:
         cluster:
           instances: 1
+          monitoring:
+            enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: crud

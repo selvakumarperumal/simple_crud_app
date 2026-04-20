@@ -45,14 +45,19 @@ data:
           ]
         },
         {
-          "title": "Active Requests",
-          "description": "Shows the current number of in-flight HTTP requests being processed by the application. Helps identify concurrency levels or potentially stuck requests.",
+          "title": "Total Requests",
+          "description": "Shows the total number of HTTP requests received by the application. Provides a quick count of overall traffic volume.",
           "type": "stat",
           "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
           "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "0"
+            }
+          },
           "targets": [
             {
-              "expr": "sum(http_requests_in_progress{service=\"{{ $fullname }}\"})"
+              "expr": "sum(http_requests_total{service=\"{{ $fullname }}\"})"
             }
           ]
         },
@@ -62,9 +67,14 @@ data:
           "type": "stat",
           "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
           "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "0"
+            }
+          },
           "targets": [
             {
-              "expr": "sum(rate(http_request_duration_seconds_count{service=\"{{ $fullname }}\", status=~\"5..\"}[5m]))"
+              "expr": "sum(rate(http_requests_total{service=\"{{ $fullname }}\", status=~\"5..\"}[5m])) or vector(0)"
             }
           ]
         },
