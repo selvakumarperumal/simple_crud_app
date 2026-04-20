@@ -36,7 +36,7 @@ spec:
                   key: {{ .Values.database.secretKey }}
             - name: DATABASE_URL
               value: $(PG_URI)
-          command: ["sh", "-c", "export DATABASE_URL=$(echo $DATABASE_URL | sed 's|^postgres\(ql\)\?://|postgresql+asyncpg://|'); exec uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+          command: ["sh", "-c", "export DATABASE_URL=$(echo $DATABASE_URL | sed 's|^postgres://|postgresql+asyncpg://|' | sed 's|^postgresql://|postgresql+asyncpg://|'); exec uvicorn app.main:app --host 0.0.0.0 --port 8000"]
           livenessProbe:
             httpGet:
               path: /health
