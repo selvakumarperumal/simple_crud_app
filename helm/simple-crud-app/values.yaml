@@ -49,8 +49,3 @@ monitoring:
   grafana:
     dashboards:
       enabled: true
-  loki:
-    datasource:
-      enabled: true
-      url: http://loki:3100
-      grafanaNamespace: monitoring

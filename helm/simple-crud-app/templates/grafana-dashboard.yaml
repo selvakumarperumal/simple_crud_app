@@ -93,7 +93,7 @@ data:
             "sortOrder": "Descending",
             "enableLogDetails": true
           },
-          "datasource": { "type": "loki", "uid": "loki" }
+          "datasource": { "type": "loki" }
         },
         {
           "title": "CNPG — Transactions per Second",

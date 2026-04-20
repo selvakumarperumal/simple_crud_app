@@ -17,7 +17,6 @@ spec:
       releaseName: crud-app
       valueFiles:
         - values.yaml
-        - values-monitoring.yaml
       # --- Minikube overrides (remove for EKS) ---
       valuesObject:
         image:
