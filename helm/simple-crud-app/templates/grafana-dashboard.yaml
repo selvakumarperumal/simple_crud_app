@@ -1,6 +1,5 @@
 {{- if .Values.monitoring.grafana.dashboards.enabled }}
 {{- $fullname := include "simple-crud-app.fullname" . -}}
-{{- $name := include "simple-crud-app.name" . -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -85,7 +84,7 @@ data:
           "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
           "targets": [
             {
-              "expr": "{namespace=\"{{ .Release.Namespace }}\", app_kubernetes_io_name=\"{{ $name }}\"}",
+              "expr": "{namespace=\"{{ .Release.Namespace }}\", pod=~\"{{ $fullname }}.*\"}",
               "refId": "A"
             }
           ],
@@ -104,7 +103,7 @@ data:
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
-              "expr": "sum(rate(cnpg_pg_stat_database_xact_commit{datname=\"crud_db\"}[5m]))",
+              "expr": "sum(rate(cnpg_pg_stat_database_xact_commit{datname=\"crud_db\"}[5m])) or vector(0)",
               "legendFormat": "commits/s"
             }
           ]
@@ -117,8 +116,8 @@ data:
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
-              "expr": "cnpg_pg_replication_lag{namespace=\"{{ .Release.Namespace }}\"}",
-              "legendFormat": "{{`{{pod}}`}}"
+              "expr": "max(cnpg_pg_replication_lag{namespace=\"{{ .Release.Namespace }}\"}) or vector(0)",
+              "legendFormat": "replication lag"
             }
           ]
         }

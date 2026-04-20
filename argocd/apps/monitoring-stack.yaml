@@ -31,6 +31,10 @@ spec:
         prometheus:
           prometheusSpec:
             scrapeInterval: 15s
+            # Allow Prometheus to discover PodMonitors created by other charts/operators,
+            # including the CNPG operator-generated PodMonitor.
+            podMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelector: {}
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

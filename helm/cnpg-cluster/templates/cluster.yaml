@@ -23,6 +23,5 @@ spec:
     {{- toYaml .Values.cluster.resources | nindent 4 }}
 
   {{- if .Values.cluster.monitoring.enabled }}
-  monitoring:
-    enablePodMonitor: true
+  monitoring: {}
   {{- end }}
