@@ -1,7 +1,11 @@
 import uuid
-from datetime import UTC, datetime
+from datetime import datetime
 
 from sqlmodel import Field, SQLModel
+
+
+def utcnow_naive() -> datetime:
+    return datetime.utcnow()
 
 
 # ---------- Shared / base ----------
@@ -17,8 +21,8 @@ class Item(ItemBase, table=True):
     __tablename__ = "items"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    created_at: datetime = Field(default_factory=utcnow_naive)
+    updated_at: datetime = Field(default_factory=utcnow_naive)
 
 
 # ---------- Request schemas ----------

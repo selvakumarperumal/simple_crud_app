@@ -11,6 +11,7 @@ metadata:
 data:
   fastapi-crud.json: |
     {
+      "description": "Comprehensive monitoring dashboard for the FastAPI CRUD application. Displays golden signals (traffic, latency, errors), pod logs, and CloudNativePG database metrics.",
       "annotations": { "list": [] },
       "editable": true,
       "fiscalYearStartMonth": 0,
@@ -19,6 +20,7 @@ data:
       "panels": [
         {
           "title": "Request Rate (req/s)",
+          "description": "Shows the rate of incoming HTTP requests per second, broken down by HTTP method, handler, and response status code. Useful for identifying traffic spikes or drops.",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
           "targets": [
@@ -30,6 +32,7 @@ data:
         },
         {
           "title": "Request Duration (p95)",
+          "description": "Displays the 95th percentile response time for HTTP requests by handler. Indicates that 95% of requests are completed within this duration. High values point to performance bottlenecks in specific endpoints.",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
           "targets": [
@@ -41,6 +44,7 @@ data:
         },
         {
           "title": "Active Requests",
+          "description": "Shows the current number of in-flight HTTP requests being processed by the application. Helps identify concurrency levels or potentially stuck requests.",
           "type": "stat",
           "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
           "targets": [
@@ -51,6 +55,7 @@ data:
         },
         {
           "title": "Error Rate (5xx)",
+          "description": "Displays the rate of server-side (5xx) errors over the last 5 minutes. Spikes indicate application crashes, unhandled exceptions, or systemic issues preventing successful request processing.",
           "type": "stat",
           "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
           "targets": [
@@ -61,6 +66,7 @@ data:
         },
         {
           "title": "Pod Logs",
+          "description": "Displays real-time logs from the application pods, fetched via Loki. Essential for debugging errors or correlating metric anomalies with specific log events.",
           "type": "logs",
           "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
           "targets": [
@@ -78,6 +84,7 @@ data:
         },
         {
           "title": "CNPG — Transactions per Second",
+          "description": "Shows the rate of committed transactions per second in the CloudNativePG database (crud_db). Indicates the database write and commit workload.",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
           "targets": [
@@ -89,6 +96,7 @@ data:
         },
         {
           "title": "CNPG — Replication Lag (bytes)",
+          "description": "Monitors the replication lag between the primary and standby nodes in the CloudNativePG cluster in bytes. High lag can indicate network issues, disk I/O bottlenecks, or an overloaded standby.",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
           "targets": [

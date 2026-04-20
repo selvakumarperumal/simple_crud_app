@@ -1,12 +1,11 @@
 import uuid
-from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.database import get_session
-from app.models import Item, ItemCreate, ItemRead, ItemUpdate
+from app.models import Item, ItemCreate, ItemRead, ItemUpdate, utcnow_naive
 
 router = APIRouter(prefix="/items", tags=["items"])
 
@@ -50,7 +49,7 @@ async def update_item(
     update_data = payload.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(item, key, value)
-    item.updated_at = datetime.now(UTC)
+    item.updated_at = utcnow_naive()
     session.add(item)
     await session.commit()
     await session.refresh(item)

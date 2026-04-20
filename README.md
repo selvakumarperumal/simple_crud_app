@@ -404,9 +404,11 @@ curl <URL>/health
 | Issue | Fix |
 |-------|-----|
 | Pods in Pending | Increase Minikube memory: `minikube start --memory=6144` |
+| Grafana CrashLoopBackOff — "Only one datasource per organization can be marked as default" | Both kube-prometheus-stack (Prometheus) and loki-stack (Loki) set `isDefault: true`. Fix: set `loki.isDefault: false` in `argocd/apps/loki.yaml` (or `--set loki.isDefault=false` for manual Helm). Then delete the stale ConfigMap so ArgoCD recreates it: `kubectl delete cm loki-loki-stack -n monitoring` |
 | Loki not showing in Grafana | Verify datasource ConfigMap: `kubectl get cm -n monitoring \| grep loki` |
 | No metrics from app | Check ServiceMonitor labels match: `kubectl get servicemonitor -n crud -o yaml` |
 | Grafana password forgot | `kubectl get secret prometheus-stack-grafana -n monitoring -o jsonpath="{.data.admin-password}" \| base64 -d` |
+| ErrImageNeverPull on Minikube | Image not built inside Minikube. Run: `minikube image build -t simple-crud-app:latest .` then restart the deployment |
 
 ```bash
 # CNPG cluster not becoming healthy
