@@ -20,9 +20,9 @@ spec:
       # --- Minikube overrides (remove for EKS) ---
       valuesObject:
         image:
-          pullPolicy: Always
+          pullPolicy: Never
         service:
-          type: NodePort            # EKS: remove (uses ClusterIP default)
+          type: NodePort # EKS: remove (uses ClusterIP default)
   destination:
     server: https://kubernetes.default.svc
     namespace: crud
