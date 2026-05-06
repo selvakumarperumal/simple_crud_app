@@ -120,6 +120,16 @@ minikube image build -t simple-crud-app:latest .
 > docker build -t simple-crud-app:latest .
 > ```
 
+> **Using local Docker (without `minikube docker-env`):**
+> If you build with your local Docker daemon instead:
+> ```bash
+> docker build -t simple-crud-app:latest .
+> minikube image load simple-crud-app:latest
+> ```
+> This loads the locally built image into Minikube's container runtime.
+> The ArgoCD `crud-app.yaml` sets `imagePullPolicy: Never` so Kubernetes
+> uses the local image instead of trying to pull from a remote registry.
+
 Now choose **one** of the two deployment methods below:
 
 ---
