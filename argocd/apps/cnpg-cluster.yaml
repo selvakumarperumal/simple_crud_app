@@ -26,11 +26,10 @@ spec:
   ignoreDifferences:
     - group: postgresql.cnpg.io
       kind: Cluster
-      jsonPointers:
-        - /spec/monitoring
+      jqPathExpressions:
+        - .spec.monitoring
   syncPolicy:
     automated:
-      enabled: true
       prune: true
       selfHeal: true
     retry:
@@ -42,3 +41,4 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - RespectIgnoreDifferences=true
+      - ServerSideApply=true
