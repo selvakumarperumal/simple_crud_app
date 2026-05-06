@@ -30,8 +30,15 @@ spec:
         - /spec/monitoring
   syncPolicy:
     automated:
+      enabled: true
       prune: true
       selfHeal: true
+    retry:
+      limit: 10
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
     syncOptions:
       - CreateNamespace=true
       - RespectIgnoreDifferences=true

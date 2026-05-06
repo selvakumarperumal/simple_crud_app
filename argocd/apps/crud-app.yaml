@@ -20,7 +20,7 @@ spec:
       # --- Minikube overrides (remove for EKS) ---
       valuesObject:
         image:
-          pullPolicy: Never        # EKS: remove or set to Always
+          pullPolicy: Always
         service:
           type: NodePort            # EKS: remove (uses ClusterIP default)
   destination:
@@ -28,7 +28,14 @@ spec:
     namespace: crud
   syncPolicy:
     automated:
+      enabled: true
       prune: true
       selfHeal: true
+    retry:
+      limit: 10
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
     syncOptions:
       - CreateNamespace=true
