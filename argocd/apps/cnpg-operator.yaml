@@ -6,31 +6,22 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "0"
   finalizers:
-    - argocd.argoproj.io/resources-finalizer
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://cloudnative-pg.github.io/charts
     chart: cloudnative-pg
-    targetRevision: "*"
+    repoURL: https://cloudnative-pg.github.io/charts
+    targetRevision: 0.22.0
     helm:
-      releaseName: cnpg
+      releaseName: cloudnative-pg
+      valuesObject:
+        replicaCount: 1
+        monitoring:
+          podMonitorEnabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: cnpg-system
-  ignoreDifferences:
-    - group: admissionregistration.k8s.io
-      kind: ValidatingWebhookConfiguration
-      jqPathExpressions:
-        - .webhooks[]?.clientConfig.caBundle
-    - group: admissionregistration.k8s.io
-      kind: MutatingWebhookConfiguration
-      jqPathExpressions:
-        - .webhooks[]?.clientConfig.caBundle
-    - group: apiextensions.k8s.io
-      kind: CustomResourceDefinition
-      jqPathExpressions:
-        - .spec.conversion.webhook.clientConfig.caBundle
   syncPolicy:
     automated:
       prune: true
@@ -44,4 +35,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-      - RespectIgnoreDifferences=true
+  info:
+    - name: "Documentation"
+      value: "https://cloudnative-pg.io/documentation/current/"

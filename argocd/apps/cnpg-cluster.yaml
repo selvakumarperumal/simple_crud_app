@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "2"
   finalizers:
-    - argocd.argoproj.io/resources-finalizer
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
@@ -30,7 +30,7 @@ spec:
         - .spec.monitoring
   syncPolicy:
     automated:
-      prune: true
+      prune: false
       selfHeal: true
     retry:
       limit: 10

@@ -4,7 +4,7 @@ metadata:
   name: simple-crud-app-root
   namespace: argocd
   finalizers:
-    - argocd.argoproj.io/resources-finalizer
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
