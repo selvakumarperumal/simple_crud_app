@@ -334,14 +334,14 @@ This panel is different from the others — it uses **Loki** (a log aggregation 
 
 There are **two escaping issues** in this file that often cause confusion:
 
-### 5.1 — Double-Escaped Quotes: `\\\"`
+### 5.1 — Standard JSON Escaping: `\"`
 
 In the JSON, you see things like:
 ```
-{service=\\\"{{ $fullname }}\\\"}
+{service=\"{{ $fullname }}\"}
 ```
 
-Why? There are **two layers of escaping**:
+Why? It's just standard JSON escaping:
 
 | Layer | What it does | Example |
 |-------|--------------|---------|
@@ -349,10 +349,10 @@ Why? There are **two layers of escaping**:
 | **JSON** | Inside a JSON string, `\"` is how you write a literal `"` | `\"` → `"` |
 | **PromQL** | PromQL expects: `{service="my-app"}` | — |
 
-So `\\\"{{ $fullname }}\\\"` renders as:
+So `{service=\"{{ $fullname }}\"}` renders as:
 1. Helm replaces `{{ $fullname }}` → `myrelease-simple-crud-app`
-2. JSON unescapes `\"` → `"`
-3. **Final PromQL:** `{service="myrelease-simple-crud-app"}`
+2. JSON parser unescapes `\"` → `"`
+3. **Final PromQL sent to Prometheus:** `{service="myrelease-simple-crud-app"}`
 
 ### 5.2 — The Raw String Trick: `` {{`{{handler}}`}} ``
 

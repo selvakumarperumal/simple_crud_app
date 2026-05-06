@@ -173,16 +173,20 @@ cluster:
 ---
 
 ```yaml
-# Lines 21-22
+# Lines 21-25
   monitoring:
-    enabled: false
+    enabled: true
+    interval: 15s
+    additionalLabels:
+      release: prometheus-stack
 ```
 
-- **`monitoring.enabled: false`** — When `true`, the `cluster.yaml` template adds a `monitoring.enablePodMonitor: true` section to the CNPG Cluster spec.
+- **`monitoring.enabled: true`** — When `true`, the `podmonitor.yaml` template creates a PodMonitor, and the `cluster.yaml` template overrides `enablePodMonitor: false` to stop ArgoCD drift.
+- **`interval: 15s`** — Prometheus scrapes metrics every 15 seconds.
+- **`additionalLabels`** — Injects labels into the PodMonitor so the Prometheus Operator discovers it (`release: prometheus-stack`).
 - **What a PodMonitor does:** It's a Prometheus Operator CRD that tells Prometheus to scrape PostgreSQL metrics directly from the CNPG pods (port 9187, the built-in metrics exporter).
 - **Metrics exposed include:** `cnpg_pg_stat_database_xact_commit` (transactions/sec), `cnpg_pg_replication_lag` (replication lag), etc.
 - **The Grafana dashboard's CNPG panels** depend on these metrics — if monitoring is disabled here, those panels will show "No data".
-- **Default is `false`** because it requires the Prometheus Operator to be installed in the cluster first.
 
 ---
 

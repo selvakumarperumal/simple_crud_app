@@ -55,7 +55,7 @@ spec:
 
 - **`spec:`** — Desired state for the Deployment.
 - **Conditional `replicas:`** — Only set the replica count when HPA is **disabled**. If HPA is enabled, it manages the replica count — setting it here would cause conflicts (Deployment resets to this value, HPA changes it, loop).
-- **`replicas: 2`** — Run 2 pods by default.
+- **`replicas: 4`** — Run 4 pods by default (provides high availability).
 
 ---
 

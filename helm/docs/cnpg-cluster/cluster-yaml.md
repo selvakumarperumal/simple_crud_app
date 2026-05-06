@@ -144,18 +144,13 @@ spec:
 # Lines 25-28
   {{- if .Values.cluster.monitoring.enabled }}
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
   {{- end }}
 ```
 
 - **Conditional block** — Only adds the `monitoring` section when `monitoring.enabled` is `true` in values.yaml.
-- **`enablePodMonitor: true`** — Tells the CNPG operator to create a **PodMonitor** CRD (Prometheus Operator resource).
-- **What the PodMonitor does:** Instructs Prometheus to scrape PostgreSQL metrics from each CNPG pod on port 9187. Metrics include:
-  - `cnpg_pg_stat_database_xact_commit` — transaction commits
-  - `cnpg_pg_replication_lag` — replication lag in bytes
-  - `cnpg_pg_stat_bgwriter_*` — background writer stats
-  - And many more from PostgreSQL's `pg_stat_*` views.
-- **Why conditionally rendered?** Creating a PodMonitor without the Prometheus Operator installed would result in an API error (`no matches for kind "PodMonitor"`).
+- **`enablePodMonitor: false`** — This is explicitly set to `false` as a workaround for an ArgoCD drift issue.
+- **Why `false`?** The CNPG operator's mutating webhook injects `enablePodMonitor: false` into the cluster resource at runtime if a PodMonitor isn't explicitly requested or created. If we use `{}` or omit it, ArgoCD sees a difference between the Git state (empty/omitted) and the cluster state (`enablePodMonitor: false`) and continuously tries to sync the app, causing an infinite loop. Setting it explicitly to `false` matches the operator's runtime mutation and stabilizes ArgoCD.
 
 ---
 

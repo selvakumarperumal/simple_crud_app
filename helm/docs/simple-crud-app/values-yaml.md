@@ -14,12 +14,12 @@ The default configuration for the chart. Every key here is accessible in templat
 
 ```yaml
 # Line 1
-replicaCount: 2
+replicaCount: 4
 ```
 
 - Number of pod replicas for the Deployment.
 - **Ignored when HPA is enabled** — the `deployment.yaml` template has `{{- if not .Values.autoscaling.enabled }}` around the `replicas:` field.
-- `2` provides basic redundancy — if one pod crashes, the other handles traffic while it restarts.
+- `4` provides redundancy and high availability.
 
 ---
 
@@ -34,12 +34,12 @@ replicaCount: 2
 image:
   repository: simple-crud-app
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 ```
 
 - **`repository: simple-crud-app`** — Docker image name. For ECR, override to `<account-id>.dkr.ecr.<region>.amazonaws.com/simple-crud-app`.
 - **`tag: latest`** — Image tag. In production, use a specific version (e.g., `v0.1.0`) to avoid deploying unexpected changes.
-- **`pullPolicy: IfNotPresent`** — Kubernetes pulls the image only if it's not already cached on the node.
+- **`pullPolicy: Always`** — Kubernetes will always pull the image, ensuring that the latest changes are deployed.
   - `Always` — Always pull (good for `latest` tag in production).
   - `Never` — Never pull (required for Minikube with local images).
   - `IfNotPresent` — Pull only if missing (default, good balance).
@@ -201,28 +201,19 @@ database:
 ---
 
 ```yaml
-# Lines 43-55
+# Lines 43-52
 monitoring:
   serviceMonitor:
-    enabled: false
+    enabled: true
     interval: 15s
-    additionalLabels: {}
+    additionalLabels:
+      release: prometheus-stack
   grafana:
     dashboards:
-      enabled: false
-  loki:
-    datasource:
-      enabled: false
-      url: http://loki:3100
-      grafanaNamespace: monitoring
+      enabled: true
 ```
 
-- **`serviceMonitor.enabled: false`** — When `true`, creates a `ServiceMonitor` CRD so Prometheus scrapes `/metrics` from the app.
+- **`serviceMonitor.enabled: true`** — Creates a `ServiceMonitor` CRD so Prometheus scrapes `/metrics` from the app.
 - **`serviceMonitor.interval: 15s`** — Prometheus scrapes every 15 seconds.
-- **`serviceMonitor.additionalLabels: {}`** — Extra labels to add to the ServiceMonitor. Typically set to `release: prometheus-stack` so the Prometheus operator discovers it (the operator filters ServiceMonitors by label).
-- **`grafana.dashboards.enabled: false`** — When `true`, creates a ConfigMap with the Grafana dashboard JSON. Grafana's sidecar auto-imports it.
-- **`loki.datasource.enabled: false`** — When `true`, creates a ConfigMap that registers Loki as a Grafana datasource.
-- **`loki.datasource.url: http://loki:3100`** — The in-cluster URL for Loki. `loki` is the Kubernetes Service name in the monitoring namespace.
-- **`loki.datasource.grafanaNamespace: monitoring`** — The namespace where Grafana is running. The Loki datasource ConfigMap is created in THIS namespace (not the app namespace) because the Grafana sidecar only watches its own namespace.
-
-All three monitoring features default to `false` so the chart works without the monitoring stack installed. Use `values-monitoring.yaml` overlay to enable them all at once.
+- **`serviceMonitor.additionalLabels`** — Extra labels to add to the ServiceMonitor. Set to `release: prometheus-stack` so the Prometheus operator discovers it.
+- **`grafana.dashboards.enabled: true`** — Creates a ConfigMap with the Grafana dashboard JSON. Grafana's sidecar auto-imports it.
