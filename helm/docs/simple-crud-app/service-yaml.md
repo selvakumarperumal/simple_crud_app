@@ -73,7 +73,7 @@ spec:
 - **`protocol: TCP`** — TCP protocol (HTTP runs over TCP).
 - **`name: http`** — Named port identifier. Referenced by:
   - `servicemonitor.yaml` → `endpoints[0].port: http`
-  - `ingress.yaml` could reference it by name instead of number
+  - `virtualservice.yaml` could reference it by name instead of number
   - Kubernetes documentation/debugging
 
 **Traffic flow:**

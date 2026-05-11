@@ -85,31 +85,22 @@ service:
 ---
 
 ```yaml
-# Lines 13-21
-ingress:
-  enabled: false
-  className: nginx
+# Lines 13-20
+istio:
+  enabled: true
+  gateway:
+    create: true
+    selector:
+      istio: ingressgateway
   hosts:
-    - host: crud-app.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
+    - crud-app.local
 ```
 
-- **`enabled: false`** — Ingress resource is NOT created by default. Set `true` to enable external HTTP access via a domain name.
-- **`className: nginx`** — Specifies which Ingress controller handles this resource. Change to `alb` for AWS ALB Ingress Controller.
-- **`hosts`** — List of hostnames and URL paths to route:
-  - `host: crud-app.local` — The domain name. On Minikube, add this to `/etc/hosts` pointing to the Minikube IP.
-  - `path: /` — Match all paths.
-  - `pathType: Prefix` — Match URLs starting with `/`. The other option is `Exact` (match exactly).
-- **`tls: []`** — Empty = no HTTPS. To enable, provide a TLS secret:
-  ```yaml
-  tls:
-    - secretName: crud-app-tls
-      hosts:
-        - crud-app.local
-  ```
+- **`enabled: true`** — Creates Istio VirtualService (and optionally Gateway) for routing external HTTP traffic. Replaces standard Kubernetes Ingress.
+- **`gateway.create: true`** — Creates an Istio `Gateway` resource for the app. If false, you can specify `gateway.name` to attach the VirtualService to an existing shared Gateway.
+- **`gateway.selector`** — Pod labels used to select the Istio ingress gateway deployment (default: `istio: ingressgateway`).
+- **`hosts`** — List of hostnames to route.
+  - `crud-app.local` — The domain name. The VirtualService will route traffic matching this host to the application.
 
 ---
 

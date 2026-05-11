@@ -1,0 +1,28 @@
+{{- if .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "simple-crud-app.fullname" . }}
+  labels:
+    {{- include "simple-crud-app.labels" . | nindent 4 }}
+spec:
+  hosts:
+    {{- range .Values.istio.hosts }}
+    - {{ . | quote }}
+    {{- end }}
+  gateways:
+    {{- if .Values.istio.gateway.create }}
+    - {{ include "simple-crud-app.fullname" . }}
+    {{- else if .Values.istio.gateway.name }}
+    - {{ .Values.istio.gateway.name }}
+    {{- end }}
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: {{ include "simple-crud-app.fullname" . }}
+            port:
+              number: {{ .Values.service.port }}
+{{- end }}

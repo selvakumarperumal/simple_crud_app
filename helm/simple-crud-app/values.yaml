@@ -10,15 +10,14 @@ service:
   port: 80
   targetPort: 8000
 
-ingress:
-  enabled: false
-  className: nginx
+istio:
+  enabled: true
+  gateway:
+    create: true
+    selector:
+      istio: ingressgateway
   hosts:
-    - host: crud-app.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
+    - crud-app.local
 
 resources:
   requests:
